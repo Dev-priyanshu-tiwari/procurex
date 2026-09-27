@@ -171,6 +171,7 @@ function App() {
       </div>
 
       <div className="shell">
+        {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',zIndex:34,display:'block'}} className="mobile-sidebar-overlay"/>}
         <aside className={sidebarOpen ? "sidebar" : "sidebar collapsed"}>
           <div className="side-heading">WORKSPACE</div>
           <NavItem active={page==="dashboard"} label="Dashboard" icon={LayoutDashboard} onClick={()=>go("dashboard")} />
@@ -218,9 +219,9 @@ function NavItem({active,label,icon:Icon,onClick}) {
 }
 
 function PageHead({eyebrow,title,sub,action}) {
-  return <div className="page-head">
-    <div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{sub}</p></div>
-    {action}
+  return <div className="page-head" style={{flexWrap:'wrap',gap:'12px'}}>
+    <div style={{flex:1,minWidth:0}}><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{sub}</p></div>
+    {action && <div style={{flexShrink:0}}>{action}</div>}
   </div>
 }
 
@@ -312,8 +313,8 @@ function ChallengeCard({item,onOpen}) {
 function Challenges({data,query,setQuery,filter,setFilter,openChallenge,notify,openCreate}) {
   return <>
     <PageHead eyebrow="CHALLENGE STUDIO" title="Government Challenges" sub="Create outcome-based problem statements and manage innovation demand." action={<button className="primary-button" onClick={openCreate}><Target size={17}/> New Challenge</button>}/>
-    <div className="toolbar panel">
-      <div className="search-box"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search challenges, departments or sectors..." /></div>
+    <div className="toolbar panel" style={{flexWrap:'wrap'}}>
+      <div className="search-box" style={{flex:'1 1 200px'}}><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search challenges..." /></div>
       <div className="filter-wrap"><Filter size={15}/><select value={filter} onChange={e=>setFilter(e.target.value)}><option>All</option><option>Accepting Applications</option><option>Evaluation</option><option>Pilot</option><option>Draft</option></select></div>
       <button className="outline-button" onClick={()=>notify("Advanced filters simulated")}>Advanced filters</button>
     </div>
@@ -334,8 +335,8 @@ function Startups({openStartup,notify}) {
       <div><b>AI-Based Matching</b><span>18 startups match the featured waste-management challenge. Matching is simulated for this prototype.</span></div>
       <button className="light-blue-button" onClick={()=>notify("Matching explanation simulated")}>Why these matches?</button>
     </div>
-    <div className="toolbar panel">
-      <div className="search-box"><Search size={17}/><input placeholder="Search by technology, sector or capability..." /></div>
+    <div className="toolbar panel" style={{flexWrap:'wrap'}}>
+      <div className="search-box" style={{flex:'1 1 200px'}}><Search size={17}/><input placeholder="Search by technology or sector..." /></div>
       {["All Sectors","AI","IoT","Health","Water"].map((x,i)=><button key={x} className={i===0?"filter-pill selected":"filter-pill"} onClick={()=>notify(`${x} filter selected`)}>{x}</button>)}
       <button className="outline-button" onClick={()=>notify("Location and stage filters simulated")}>More filters <ChevronDown size={14}/></button>
     </div>
