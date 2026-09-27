@@ -109,7 +109,7 @@ const evalScores = [
 
 function App() {
   const [page, setPage] = useState("dashboard");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // closed by default on mobile
   const [activeChallenge, setActiveChallenge] = useState(challenges[0]);
   const [activeStartup, setActiveStartup] = useState(startups[0]);
   const [modal, setModal] = useState(null);
@@ -151,7 +151,7 @@ function App() {
     <div className={dark ? "app dark" : "app"}>
       <div className="topbar">
         <div className="brand-wrap">
-          <button className="icon-button mobile-only" onClick={() => setSidebarOpen(v=>!v)}><Menu size={19}/></button>
+          <button className="icon-button hamburger-btn" onClick={() => setSidebarOpen(v=>!v)} aria-label="Toggle menu"><Menu size={19}/></button>
           <div className="logo">PX</div>
           <div>
             <div className="brand">Procure<span>X</span></div>
@@ -171,21 +171,28 @@ function App() {
       </div>
 
       <div className="shell">
-        {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',zIndex:34,display:'block'}} className="mobile-sidebar-overlay"/>}
-        <aside className={sidebarOpen ? "sidebar" : "sidebar collapsed"}>
+        {/* Dark overlay - only on mobile when sidebar is open */}
+        {sidebarOpen && (
+          <div
+            onClick={() => setSidebarOpen(false)}
+            style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:34}}
+            className="mobile-sidebar-overlay"
+          />
+        )}
+        <aside className={sidebarOpen ? "sidebar open" : "sidebar"}>
           <div className="side-heading">WORKSPACE</div>
-          <NavItem active={page==="dashboard"} label="Dashboard" icon={LayoutDashboard} onClick={()=>go("dashboard")} />
-          <NavItem active={page==="challenges"} label="Challenges" icon={Target} onClick={()=>go("challenges")} />
-          <NavItem active={page==="startups"} label="Startups" icon={Rocket} onClick={()=>go("startups")} />
-          <NavItem active={page==="evaluations"} label="Evaluations" icon={ClipboardCheck} onClick={()=>go("evaluations")} />
-          <NavItem active={page==="pilots"} label="Pilots" icon={TestTube2} onClick={()=>go("pilots")} />
-          <NavItem active={page==="procurement"} label="Procurement" icon={PackageCheck} onClick={()=>go("procurement")} />
-          <NavItem active={page==="analytics"} label="Analytics" icon={BarChart3} onClick={()=>go("analytics")} />
+          <NavItem active={page==="dashboard"} label="Dashboard" icon={LayoutDashboard} onClick={()=>go("dashboard")} closeSidebar={()=>setSidebarOpen(false)} />
+          <NavItem active={page==="challenges"} label="Challenges" icon={Target} onClick={()=>go("challenges")} closeSidebar={()=>setSidebarOpen(false)} />
+          <NavItem active={page==="startups"} label="Startups" icon={Rocket} onClick={()=>go("startups")} closeSidebar={()=>setSidebarOpen(false)} />
+          <NavItem active={page==="evaluations"} label="Evaluations" icon={ClipboardCheck} onClick={()=>go("evaluations")} closeSidebar={()=>setSidebarOpen(false)} />
+          <NavItem active={page==="pilots"} label="Pilots" icon={TestTube2} onClick={()=>go("pilots")} closeSidebar={()=>setSidebarOpen(false)} />
+          <NavItem active={page==="procurement"} label="Procurement" icon={PackageCheck} onClick={()=>go("procurement")} closeSidebar={()=>setSidebarOpen(false)} />
+          <NavItem active={page==="analytics"} label="Analytics" icon={BarChart3} onClick={()=>go("analytics")} closeSidebar={()=>setSidebarOpen(false)} />
 
           <div className="side-heading second">GOVERNANCE</div>
-          <NavItem label="Audit & Transparency" icon={FileCheck2} onClick={()=>notify("Audit view opened in demo")} />
-          <NavItem label="Compliance Center" icon={ShieldCheck} onClick={()=>notify("Compliance center opened in demo")} />
-          <NavItem label="Settings" icon={Settings} onClick={()=>notify("Settings opened in demo")} />
+          <NavItem label="Audit & Transparency" icon={FileCheck2} onClick={()=>notify("Audit view opened in demo")} closeSidebar={()=>setSidebarOpen(false)} />
+          <NavItem label="Compliance Center" icon={ShieldCheck} onClick={()=>notify("Compliance center opened in demo")} closeSidebar={()=>setSidebarOpen(false)} />
+          <NavItem label="Settings" icon={Settings} onClick={()=>notify("Settings opened in demo")} closeSidebar={()=>setSidebarOpen(false)} />
 
           <div className="side-card">
             <div className="side-card-icon"><Sparkles size={16}/></div>
@@ -214,8 +221,17 @@ function App() {
   );
 }
 
-function NavItem({active,label,icon:Icon,onClick}) {
-  return <button className={active ? "nav-item active" : "nav-item"} onClick={onClick}><Icon size={18}/><span>{label}</span>{active && <span className="nav-active-bar"/>}</button>
+function NavItem({active,label,icon:Icon,onClick,closeSidebar}) {
+  return (
+    <button
+      className={active ? "nav-item active" : "nav-item"}
+      onClick={() => { onClick && onClick(); closeSidebar && closeSidebar(); }}
+    >
+      <Icon size={18}/>
+      <span className="nav-label">{label}</span>
+      {active && <span className="nav-active-bar"/>}
+    </button>
+  );
 }
 
 function PageHead({eyebrow,title,sub,action}) {
