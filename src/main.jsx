@@ -109,7 +109,18 @@ const evalScores = [
 
 function App() {
   const [page, setPage] = useState("dashboard");
-  const [sidebarOpen, setSidebarOpen] = useState(false); // closed by default on mobile
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 900);
+
+  // Auto close sidebar on mobile resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900) {
+        setSidebarOpen(false); // on desktop sidebar is always visible via CSS, state doesn't matter
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [activeChallenge, setActiveChallenge] = useState(challenges[0]);
   const [activeStartup, setActiveStartup] = useState(startups[0]);
   const [modal, setModal] = useState(null);
@@ -172,14 +183,12 @@ function App() {
 
       <div className="shell">
         {/* Dark overlay - only on mobile when sidebar is open */}
-        {sidebarOpen && (
-          <div
-            onClick={() => setSidebarOpen(false)}
-            style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:34}}
-            className="mobile-sidebar-overlay"
-          />
-        )}
-        <aside className={sidebarOpen ? "sidebar open" : "sidebar"}>
+        <div
+          className="mobile-sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+          style={{display: sidebarOpen ? 'block' : 'none'}}
+        />
+        <aside className={sidebarOpen ? "sidebar open" : "sidebar"} style={window.innerWidth > 900 ? {position:'sticky',transform:'none',height:'calc(100vh - 72px)',top:'72px'} : {}}>
           <div className="side-heading">WORKSPACE</div>
           <NavItem active={page==="dashboard"} label="Dashboard" icon={LayoutDashboard} onClick={()=>go("dashboard")} closeSidebar={()=>setSidebarOpen(false)} />
           <NavItem active={page==="challenges"} label="Challenges" icon={Target} onClick={()=>go("challenges")} closeSidebar={()=>setSidebarOpen(false)} />
